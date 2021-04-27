@@ -653,6 +653,10 @@ def parse_args():
 						help="Name of definitional sentence pairs.")
 	parser.add_argument("--num_dimension", "-k", type=int, default=1,
 						help="dimensionality of bias subspace")
+	parser.add_argument('--debias_weight',
+	                    type=float, default=1.0,
+						help="Projection subtraction weight when debiasing.")
+
 	args = parser.parse_args()
 
 	if (args.output_dir == None):
@@ -716,7 +720,7 @@ def get_encodings(args, encs, tokenizer, bert_encoder, gender_space, device,
 		for index, emb in enumerate(all_embeddings):
 			emb /= np.linalg.norm(emb)
 			if (args.debias and not category in {'male','female'}): # don't debias gender definitional sentences
-				emb = my_we.dropspace(emb, gender_space)
+				emb = my_we.dropspace(emb, gender_space, alpha=args.debias_weight)
 			emb /= np.linalg.norm(emb) # Normalization actually doesn't affect e_size
 			emb_dict[index] = emb
 

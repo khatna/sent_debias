@@ -1,4 +1,4 @@
-from pattern3.en import pluralize, singularize
+from pattern.en import pluralize, singularize
 
 
 def my_pluralize(word):

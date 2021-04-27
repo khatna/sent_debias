@@ -68,6 +68,9 @@ def parse_args():
 	parser.add_argument("--encode_only", action='store_true')
 	parser.add_argument("--num_dimension", "-k", type=int, default=1,
 						help="dimensionality of bias subspace")
+	parser.add_argument('--debias_weight',
+	                    type=float, default=1.0,
+						help="Projection subtraction weight when debiasing.")
 	args = parser.parse_args()
 	if (args.output_name == None):
 		args.output_name = args.def_pairs_name if args.debias else "biased"
@@ -359,7 +362,7 @@ class WordEvaluator(object):
 		specific_set = set(gender_specific_words)
 		for i, w in enumerate(self.vocab):
 			if (not isInSet(w, specific_set)):
-				self.E.vecs[i] = my_we.dropspace(self.E.vecs[i], gender_subspace)
+				self.E.vecs[i] = my_we.dropspace(self.E.vecs[i], gender_subspace, alpha=args.debias_weight)
 		self.E.normalize()
 
 		# Equalize

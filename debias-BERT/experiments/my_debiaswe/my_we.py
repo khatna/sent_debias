@@ -240,8 +240,9 @@ def drop(u, v):
 	return u - v * u.dot(v) / v.dot(v)
 
 
-def dropspace(u, V):
+def dropspace(u, V, alpha=1.0):
 	norm_sqrd = np.sum(V*V, axis=-1)
 	vecs = np.divide(V@u, norm_sqrd)[:, None] * V
 	subspace = np.sum(vecs, axis=0)
-	return u - subspace
+	alpha = np.clip(alpha, 0, 1.0)
+	return u - alpha * subspace
