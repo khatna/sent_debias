@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # retrieval on biased/debiased sentence embeddings
 # model is pretrained BERT
 
-DATA_DIR = "./acl_bias_eval_results/pretrained"
+DATA_DIR = "/home/khatna/Code/pu/cos484/downstream/ref"
 
 def load_encs(test_id, debiased):
 	bias_flag = "debiased" if debiased else "biased"
@@ -35,7 +35,7 @@ def load_encs(test_id, debiased):
 		text2encs = dict()
 		for text_id in text_ids:
 			text = text_ids[text_id]
-			sent_enc = group_encs[str(text_id)]
+			sent_enc = group_encs[text_id]
 			text2encs[text] = sent_enc
 		if ("male" in category.lower()):	
 			gender_data[category] = text2encs
@@ -114,7 +114,7 @@ def retrieve_topk(test_id, debiased, k=10):
 		print(count_dict)
 
 test_id = "7b"
-retrieve_topk(test_id=test_id, debiased=False)
+# retrieve_topk(test_id=test_id, debiased=False)
 retrieve_topk(test_id=test_id, debiased=True)
 
 '''

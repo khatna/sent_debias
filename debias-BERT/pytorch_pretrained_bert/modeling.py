@@ -996,11 +996,11 @@ class BertForSequenceClassification(BertPreTrainedModel):
 		# if (remove_bias):
 		# 	logger.info("Bias direction first 10 elements={}".format(bias_dir[:10]))
 
-	def drop_bias(self, u, v):
-		return u - torch.ger(torch.matmul(u, v), v) / v.dot(v)
+	def drop_bias(self, u, v, alpha=1.0):
+		return u - alpha * torch.ger(torch.matmul(u, v), v) / v.dot(v)
 
 	def forward(self, input_ids, token_type_ids=None, attention_mask=None, labels=None, 
-				encode_only=False, word_level=False, remove_bias=False, bias_dir=None):
+				encode_only=False, word_level=False, remove_bias=False, bias_dir=None, alpha=1.0):
 		encoded_layers, pooled_output = self.bert(input_ids, token_type_ids=token_type_ids, 
 						attention_mask=attention_mask, output_all_encoded_layers=False)
 		# pooled_output: batch_size x embed_size
@@ -1013,7 +1013,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
 			# remove bias
 			if (remove_bias):
 				for t in range(seq_length):
-					embeddings[:, t] = self.drop_bias(embeddings[:, t], bias_dir)
+					embeddings[:, t] = self.drop_bias(embeddings[:, t], bias_dir, alpha=alpha)
 				embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=-1)
 			# # average over time steps
 			# embeddings = torch.mean(embeddings, dim=1) # [batch size x hidden size]
@@ -1022,7 +1022,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
 			if (self.normalize):
 				embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=-1)
 			if (remove_bias):
-				embeddings = self.drop_bias(embeddings, bias_dir)
+				embeddings = self.drop_bias(embeddings, bias_dir, alpha=alpha)
 				embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=-1)
 
 		if (not self.tune_bert): embeddings.detach()

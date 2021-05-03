@@ -932,7 +932,7 @@ def main():
 				input_ids, input_mask, segment_ids, label_ids = batch
 
 				# define a new function to compute loss values for both output_modes
-				logits = model(input_ids, segment_ids, input_mask, remove_bias=args.debias, bias_dir=gender_dir_pretrained)
+				logits = model(input_ids, segment_ids, input_mask, remove_bias=args.debias, bias_dir=gender_dir_pretrained, alpha=args.debias_weight)
 
 				if output_mode == "classification":
 					loss_fct = CrossEntropyLoss()
@@ -1023,7 +1023,7 @@ def main():
 
 			with torch.no_grad():
 				logits = model(input_ids, segment_ids, input_mask, 
-					labels=None, remove_bias=args.debias, bias_dir=gender_dir_tuned)
+					labels=None, remove_bias=args.debias, bias_dir=gender_dir_tuned, alpha=args.debias_weight)
 
 			# create eval loss and other metric required by the task
 			if output_mode == "classification":
